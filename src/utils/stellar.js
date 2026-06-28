@@ -52,10 +52,23 @@ export async function fundWithFriendbot(address) {
 
 export async function sendTipTransaction(senderAddress, recipientAddress, amount) {
   try {
+    console.log('--- DEBUG STELLAR TRANSACTION ---');
+    console.log('Networks object:', Networks);
+    console.log('Networks.TESTNET value:', Networks ? Networks.TESTNET : 'undefined');
+    console.log('BASE_FEE value:', BASE_FEE);
+    console.log('Sender Address:', senderAddress);
+    console.log('Recipient Address:', recipientAddress);
+    console.log('Amount:', amount);
+
     const account = await server.loadAccount(senderAddress);
+    
+    // Explicitly use the raw Testnet passphrase string to prevent any bundling/undefined issues
+    const testnetPassphrase = 'Test SDF Network ; September 2015';
+    console.log('Using passphrase:', testnetPassphrase);
+
     const transaction = new TransactionBuilder(account, {
-      fee: BASE_FEE,
-      networkPassphrase: Networks.TESTNET,
+      fee: BASE_FEE || '100',
+      networkPassphrase: testnetPassphrase,
     })
       .addOperation(
         Operation.payment({
@@ -68,9 +81,14 @@ export async function sendTipTransaction(senderAddress, recipientAddress, amount
       .build();
 
     const xdr = transaction.toXDR();
+    console.log('Generated XDR:', xdr);
+
     const signResult = await signTransaction(xdr, {
       network: 'TESTNET',
+      networkPassphrase: testnetPassphrase,
     });
+
+    console.log('Freighter Sign Result:', signResult);
 
     if (signResult.error) {
       throw new Error(signResult.error.message || 'İmzalama işlemi reddedildi.');
@@ -78,7 +96,7 @@ export async function sendTipTransaction(senderAddress, recipientAddress, amount
 
     const txToSubmit = TransactionBuilder.fromXDR(
       signResult.signedTxXdr,
-      Networks.TESTNET
+      testnetPassphrase
     );
     const result = await server.submitTransaction(txToSubmit);
     return result.hash;
