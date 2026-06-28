@@ -4,6 +4,7 @@ import TipCard from './components/TipCard';
 import StatusModal from './components/StatusModal';
 import FaucetTrigger from './components/FaucetTrigger';
 import { getWalletAddress, fetchXlmBalance, sendTipTransaction } from './utils/stellar';
+import { translations } from './utils/translations';
 
 export default function App() {
   const [address, setAddress] = useState(null);
@@ -11,11 +12,14 @@ export default function App() {
   const [isConnecting, setIsConnecting] = useState(false);
   const [recipientAddress, setRecipientAddress] = useState('');
   const [isAddressLocked, setIsAddressLocked] = useState(false);
+  const [lang, setLang] = useState('en'); // Default to English first
   
   // Status states
   const [status, setStatus] = useState('idle'); // 'idle' | 'loading' | 'success' | 'error'
   const [errorMsg, setErrorMsg] = useState('');
   const [txHash, setTxHash] = useState('');
+
+  const t = translations[lang];
 
   // 1. Read URL params for address
   useEffect(() => {
@@ -47,7 +51,11 @@ export default function App() {
       if (addr) {
         setAddress(addr);
       } else {
-        alert('Freighter cüzdanı bulunamadı veya bağlantı reddedildi.');
+        alert(
+          lang === 'en' 
+            ? 'Freighter wallet not found or connection rejected.' 
+            : 'Freighter cüzdanı bulunamadı veya bağlantı reddedildi.'
+        );
       }
     } catch (err) {
       console.error(err);
@@ -75,7 +83,12 @@ export default function App() {
       updateBalance(); // Refresh balance after success
     } catch (err) {
       console.error(err);
-      setErrorMsg(err.message || 'İşlem sırasında beklenmeyen bir hata oluştu.');
+      setErrorMsg(
+        err.message || 
+        (lang === 'en' 
+          ? 'An unexpected error occurred during the transaction.' 
+          : 'İşlem sırasında beklenmeyen bir hata oluştu.')
+      );
       setStatus('error');
     }
   };
@@ -88,6 +101,9 @@ export default function App() {
         onConnect={handleConnect}
         onDisconnect={handleDisconnect}
         isConnecting={isConnecting}
+        lang={lang}
+        setLang={setLang}
+        t={t}
       />
 
       <main className="flex-1 flex flex-col items-center justify-center p-6 md:p-12">
@@ -96,10 +112,11 @@ export default function App() {
           isAddressLocked={isAddressLocked}
           onSubmitTip={handleSubmitTip}
           isConnected={!!address}
+          t={t}
         />
 
         {address && parseFloat(balance) === 0 && (
-          <FaucetTrigger address={address} onFunded={updateBalance} />
+          <FaucetTrigger address={address} onFunded={updateBalance} t={t} />
         )}
       </main>
 
@@ -108,6 +125,7 @@ export default function App() {
         errorMsg={errorMsg}
         txHash={txHash}
         onClose={() => setStatus('idle')}
+        t={t}
       />
     </div>
   );

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { ArrowUpRight, Copy, Check } from 'lucide-react';
 
-export default function TipCard({ recipientAddress, isAddressLocked, onSubmitTip, isConnected }) {
+export default function TipCard({ recipientAddress, isAddressLocked, onSubmitTip, isConnected, t }) {
   const [amount, setAmount] = useState('');
   const [customAddress, setCustomAddress] = useState(recipientAddress || '');
   const [copied, setCopied] = useState(false);
@@ -41,15 +41,15 @@ export default function TipCard({ recipientAddress, isAddressLocked, onSubmitTip
           className="w-24 h-24 bg-slate-800 rounded-full border-2 border-cyan-400/30 p-1 mb-4 shadow-inner"
         />
         <h2 className="text-2xl font-bold text-slate-100">
-          {isAddressLocked ? 'Kişisel Bahşiş Kutusu' : 'Bahşiş Gönder'}
+          {isAddressLocked ? t.tipCard.personalTitle : t.tipCard.generalTitle}
         </h2>
-        <p className="text-sm text-slate-400 mt-1">Stellar Testnet</p>
+        <p className="text-sm text-slate-400 mt-1">{t.tipCard.network}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-            Alıcı Cüzdan Adresi
+            {t.tipCard.recipientLabel}
           </label>
           <div className="relative">
             <input
@@ -57,7 +57,7 @@ export default function TipCard({ recipientAddress, isAddressLocked, onSubmitTip
               value={customAddress}
               onChange={(e) => setCustomAddress(e.target.value)}
               disabled={isAddressLocked}
-              placeholder="G... ile başlayan Stellar Adresi"
+              placeholder={t.tipCard.recipientPlaceholder}
               className="w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-400 transition-colors disabled:opacity-75 disabled:cursor-not-allowed pr-10"
               required
             />
@@ -65,7 +65,7 @@ export default function TipCard({ recipientAddress, isAddressLocked, onSubmitTip
               <button
                 type="button"
                 onClick={handleCopy}
-                className="absolute right-3 top-3 text-slate-400 hover:text-cyan-400 transition-colors"
+                className="absolute right-3 top-3 text-slate-400 hover:text-cyan-400 transition-colors cursor-pointer"
               >
                 {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
               </button>
@@ -75,13 +75,13 @@ export default function TipCard({ recipientAddress, isAddressLocked, onSubmitTip
 
         <div>
           <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-            Bahşiş Miktarı (XLM)
+            {t.tipCard.amountLabel}
           </label>
           <input
             type="number"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            placeholder="0.00"
+            placeholder={t.tipCard.amountPlaceholder}
             step="any"
             min="0.0000001"
             className="w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-lg font-bold focus:outline-none focus:border-purple-400 transition-colors text-cyan-300"
@@ -95,7 +95,7 @@ export default function TipCard({ recipientAddress, isAddressLocked, onSubmitTip
               key={amt}
               type="button"
               onClick={() => setAmount(amt.toString())}
-              className="flex-1 bg-slate-900/40 hover:bg-slate-900/80 border border-white/5 hover:border-cyan-500/30 text-sm font-semibold py-2.5 rounded-xl transition-all"
+              className="flex-1 bg-slate-900/40 hover:bg-slate-900/80 border border-white/5 hover:border-cyan-500/30 text-sm font-semibold py-2.5 rounded-xl transition-all cursor-pointer"
             >
               {amt} XLM
             </button>
@@ -105,15 +105,15 @@ export default function TipCard({ recipientAddress, isAddressLocked, onSubmitTip
         <button
           type="submit"
           disabled={!isConnected}
-          className="w-full bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 disabled:from-slate-800 disabled:to-slate-800 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-cyan-500/10 active:scale-98 transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+          className="w-full bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 disabled:from-slate-800 disabled:to-slate-800 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-cyan-500/10 active:scale-98 transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2 cursor-pointer"
         >
-          {isConnected ? 'Bahşişi Gönder' : 'Cüzdan Bağlantısı Gerekli'}
+          {isConnected ? t.tipCard.buttonConnected : t.tipCard.buttonDisconnected}
         </button>
       </form>
 
       {customAddress && (
         <div className="mt-6 pt-6 border-t border-white/5 flex flex-col items-center gap-3">
-          <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">QR Kodu ile Tara</span>
+          <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">{t.tipCard.qrLabel}</span>
           <div className="bg-white p-2.5 rounded-2xl shadow-md">
             <QRCodeSVG value={customAddress} size={110} />
           </div>

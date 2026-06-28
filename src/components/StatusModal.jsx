@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Loader2, CheckCircle, XCircle, ExternalLink, X } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-export default function StatusModal({ status, errorMsg, txHash, onClose }) {
+export default function StatusModal({ status, errorMsg, txHash, onClose, t }) {
   useEffect(() => {
     if (status === 'success') {
       confetti({
@@ -22,7 +22,7 @@ export default function StatusModal({ status, errorMsg, txHash, onClose }) {
         {status !== 'loading' && (
           <button 
             onClick={onClose}
-            className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+            className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -31,9 +31,9 @@ export default function StatusModal({ status, errorMsg, txHash, onClose }) {
         {status === 'loading' && (
           <div className="flex flex-col items-center py-6">
             <Loader2 className="w-12 h-12 text-cyan-400 animate-spin mb-4" />
-            <h3 className="text-lg font-bold text-slate-100">İşlem Gönderiliyor</h3>
+            <h3 className="text-lg font-bold text-slate-100">{t.statusModal.loadingTitle}</h3>
             <p className="text-xs text-slate-400 text-center mt-2 px-4">
-              Freighter cüzdanınızdan gelen onay isteğini kabul edin. İşlem Stellar testnet ağına iletiliyor...
+              {t.statusModal.loadingDesc}
             </p>
           </div>
         )}
@@ -43,17 +43,17 @@ export default function StatusModal({ status, errorMsg, txHash, onClose }) {
             <div className="bg-emerald-500/10 p-3 rounded-full text-emerald-400 mb-4">
               <CheckCircle className="w-12 h-12" />
             </div>
-            <h3 className="text-xl font-bold text-slate-100">Bahşiş Gönderildi!</h3>
-            <p className="text-sm text-slate-400 mt-1">İşleminiz başarıyla tamamlandı.</p>
+            <h3 className="text-xl font-bold text-slate-100">{t.statusModal.successTitle}</h3>
+            <p className="text-sm text-slate-400 mt-1">{t.statusModal.successDesc}</p>
             
             {txHash && (
               <a
                 href={`https://stellar.expert/explorer/testnet/tx/${txHash}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-5 flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-xs font-semibold px-4 py-2.5 rounded-xl border border-white/5 transition-colors text-cyan-400 hover:text-cyan-300"
+                className="mt-5 flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-xs font-semibold px-4 py-2.5 rounded-xl border border-white/5 transition-colors text-cyan-400 hover:text-cyan-300 cursor-pointer"
               >
-                StellarExpert'te Görüntüle
+                {t.statusModal.explorerBtn}
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             )}
@@ -65,15 +65,15 @@ export default function StatusModal({ status, errorMsg, txHash, onClose }) {
             <div className="bg-rose-500/10 p-3 rounded-full text-rose-400 mb-4">
               <XCircle className="w-12 h-12" />
             </div>
-            <h3 className="text-xl font-bold text-slate-100">İşlem Başarısız</h3>
+            <h3 className="text-xl font-bold text-slate-100">{t.statusModal.errorTitle}</h3>
             <div className="bg-rose-950/20 text-rose-300/80 border border-rose-500/10 rounded-xl p-3 text-xs w-full text-left mt-3 overflow-y-auto max-h-24 font-mono break-all">
-              {errorMsg || 'Bilinmeyen bir hata oluştu.'}
+              {errorMsg || 'Error occurred.'}
             </div>
             <button
               onClick={onClose}
-              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl border border-white/5 transition-colors mt-5 text-sm"
+              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl border border-white/5 transition-colors mt-5 text-sm cursor-pointer"
             >
-              Kapat
+              {t.statusModal.closeBtn}
             </button>
           </div>
         )}
