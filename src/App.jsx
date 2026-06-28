@@ -1,0 +1,9 @@
+import React from 'react';
+
+export default function App() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-slate-950">
+      <h1 className="text-4xl font-extrabold text-cyan-400">Stellar Tip Jar</h1>
+    </div>
+  );
+}
