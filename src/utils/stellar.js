@@ -1,18 +1,25 @@
-import { isConnected as freighterConnected, getPublicKey, signTransaction } from '@stellar/freighter-api';
+import { isConnected as freighterConnected, requestAccess, signTransaction } from '@stellar/freighter-api';
 import * as StellarSdk from '@stellar/stellar-sdk';
 
 const HORIZON_URL = 'https://horizon-testnet.stellar.org';
 const server = new StellarSdk.Horizon.Server(HORIZON_URL);
 
 export async function isConnected() {
-  return await freighterConnected();
+  const result = await freighterConnected();
+  return !!result.isConnected;
 }
 
 export async function getWalletAddress() {
   try {
     const connected = await isConnected();
     if (!connected) return null;
-    return await getPublicKey();
+    
+    const result = await requestAccess();
+    if (result.error) {
+      console.error('Freighter access denied:', result.error);
+      return null;
+    }
+    return result.address;
   } catch (error) {
     console.error('Wallet public key fetch failed:', error);
     return null;
@@ -61,12 +68,16 @@ export async function sendTipTransaction(senderAddress, recipientAddress, amount
       .build();
 
     const xdr = transaction.toXDR();
-    const signedXdr = await signTransaction(xdr, {
+    const signResult = await signTransaction(xdr, {
       network: 'TESTNET',
     });
 
+    if (signResult.error) {
+      throw new Error(signResult.error.message || 'İmzalama işlemi reddedildi.');
+    }
+
     const txToSubmit = StellarSdk.TransactionBuilder.fromXDR(
-      signedXdr,
+      signResult.signedTxXdr,
       StellarSdk.Networks.TESTNET
     );
     const result = await server.submitTransaction(txToSubmit);

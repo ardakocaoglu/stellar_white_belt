@@ -2,8 +2,9 @@ import { describe, it, expect, vi } from 'vitest';
 import { isConnected, getWalletAddress, fetchXlmBalance } from './stellar';
 
 vi.mock('@stellar/freighter-api', () => ({
-  isConnected: vi.fn(() => true),
-  getPublicKey: vi.fn(() => Promise.resolve('GBTESTADRESS12345')),
+  isConnected: vi.fn(() => Promise.resolve({ isConnected: true })),
+  requestAccess: vi.fn(() => Promise.resolve({ address: 'GBTESTADRESS12345' })),
+  signTransaction: vi.fn(() => Promise.resolve({ signedTxXdr: 'mockXDR', signerAddress: 'GBTESTADRESS12345' })),
 }));
 
 global.fetch = vi.fn();
