@@ -1,8 +1,8 @@
 import { isConnected as freighterConnected, requestAccess, signTransaction } from '@stellar/freighter-api';
-import * as StellarSdk from '@stellar/stellar-sdk';
+import { Horizon, TransactionBuilder, Networks, BASE_FEE, Operation, Asset } from '@stellar/stellar-sdk';
 
 const HORIZON_URL = 'https://horizon-testnet.stellar.org';
-const server = new StellarSdk.Horizon.Server(HORIZON_URL);
+const server = new Horizon.Server(HORIZON_URL);
 
 export async function isConnected() {
   const result = await freighterConnected();
@@ -53,14 +53,14 @@ export async function fundWithFriendbot(address) {
 export async function sendTipTransaction(senderAddress, recipientAddress, amount) {
   try {
     const account = await server.loadAccount(senderAddress);
-    const transaction = new StellarSdk.TransactionBuilder(account, {
-      fee: StellarSdk.BASE_FEE,
-      networkPassphrase: StellarSdk.Networks.TESTNET,
+    const transaction = new TransactionBuilder(account, {
+      fee: BASE_FEE,
+      networkPassphrase: Networks.TESTNET,
     })
       .addOperation(
-        StellarSdk.Operation.payment({
+        Operation.payment({
           destination: recipientAddress,
-          asset: StellarSdk.Asset.native(),
+          asset: Asset.native(),
           amount: amount.toString(),
         })
       )
@@ -76,9 +76,9 @@ export async function sendTipTransaction(senderAddress, recipientAddress, amount
       throw new Error(signResult.error.message || 'İmzalama işlemi reddedildi.');
     }
 
-    const txToSubmit = StellarSdk.TransactionBuilder.fromXDR(
+    const txToSubmit = TransactionBuilder.fromXDR(
       signResult.signedTxXdr,
-      StellarSdk.Networks.TESTNET
+      Networks.TESTNET
     );
     const result = await server.submitTransaction(txToSubmit);
     return result.hash;
